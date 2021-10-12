@@ -7,4 +7,8 @@
     <ion-label>Longitude</ion-label>
     <ion-label slot="end">{{ longitude }}</ion-label>
   </ion-item>
+  <ion-item *ngIf=isError() class="isa_error">
+    <ion-label>Error</ion-label>
+    <ion-label slot="end">{{ getError().message }}</ion-label>
+  </ion-item>
 </ion-list>
