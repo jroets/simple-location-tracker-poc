@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { LocationWatcherService } from '../services/location-watcher.service';
 
 @Component({
@@ -13,7 +13,8 @@ export class LatLongComponent implements OnInit {
   private watcherId: number;
 
   constructor(
-    private locationWatcherService: LocationWatcherService) {
+    private locationWatcherService: LocationWatcherService,
+    private cd: ChangeDetectorRef) {
 
   }
 
@@ -57,5 +58,9 @@ export class LatLongComponent implements OnInit {
     // Store the new state so the template can update
     this.error = err;
     this.position = position;
+
+    /** @todo For some reason android won't update without this (my phone at least) */
+    console.log("Forcing change detection");
+    this.cd.detectChanges();
   }
 }
