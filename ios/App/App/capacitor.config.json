@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "simple-location-tracker-poc",
+	"webDir": "www",
+	"bundledWebRuntime": false
+}
