@@ -2,12 +2,12 @@
   <ion-item>
     <ion-label>Latitude</ion-label>
     <ion-spinner slot="end" name="dots" *ngIf="!position && !error"></ion-spinner>
-    <ion-label slot="end" *ngIf=position>{{ position.coords.latitude }}</ion-label>
+    <ion-label slot="end" *ngIf=position>{{ position.coords.latitude | number : '1.7-7' }}</ion-label>
   </ion-item>
   <ion-item>
     <ion-label>Longitude</ion-label>
     <ion-spinner slot="end" name="dots" *ngIf="!position && !error"></ion-spinner>
-    <ion-label slot="end" *ngIf=position>{{ position.coords.longitude }}</ion-label>
+    <ion-label slot="end" *ngIf=position>{{ position.coords.longitude | number : '1.7-7' }}</ion-label>
   </ion-item>
   <ion-item *ngIf=error class="isa_error">
     <ion-label>{{ error.friendlyMessage }}</ion-label>

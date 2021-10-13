@@ -11,6 +11,7 @@ import * as EventEmitter from 'events';
  * The assumption is that we don't need multiple watchers.
  * 
  * @todo Notify callbacks of changes to watcher status (starting, running, stopped)
+ * @todo Consider implementing as an observable instead of callbacks
  * @todo Make the location options configurable at the app level
  * @todo Find easier/better way to monitor foreground/background transition
  */
@@ -48,6 +49,8 @@ export class LocationWatcherService {
     this.startInternalWatcher();
 
     // We're going to restart whenever the app comes from the background
+    // to deal with (what seems like) some quirks, like not detecting
+    // a permission change.
     this.emitter.addListener("toForeground", this.onForeground.bind(this));
   }
 
