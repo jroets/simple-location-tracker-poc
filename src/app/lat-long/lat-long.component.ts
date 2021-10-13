@@ -1,7 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { LocationWatcherService } from '../services/location-watcher.service';
+import { AppStateMonitor } from '../services/app-state-monitor.service';
+import * as EventEmitter from 'events';
 
-// Add a friendly message property to standard location error object
+/**
+ * This is the controller for the lat-long component.
+ * @todo Replace toForeground monitor with watcher status events.
+ * @todo iOS doesn't seem to set location error codes.
+ * @todo android doesn't like direct ref to GeolocationPositionError.
+ */
+
+/**
+ * Add a friendly message property to standard location error object
+ */
 interface LocationError extends GeolocationPositionError {
     friendlyMessage: string;
 }
@@ -14,25 +25,50 @@ interface LocationError extends GeolocationPositionError {
 export class LatLongComponent implements OnInit {
 
   // Mapping location error codes to friendly(er) messages
-  private errorCodeToMessageMap: Map<number, string> = new Map([
-    [GeolocationPositionError.PERMISSION_DENIED, "Location permission denied"],
-    [GeolocationPositionError.POSITION_UNAVAILABLE,  "Location not currently available"],
-    [GeolocationPositionError.TIMEOUT, "Timeout"]
-  ]);
-  private fallbackErrorMessage: string = "Unknown location error";
+  private errorCodeToMessageMap: Map<number, string>;
+  private fallbackErrorMessage: string;
 
   private position: GeolocationPosition;
   private error: LocationError;
   private watcherId: number;
+  private emitter: EventEmitter;
 
   constructor(
     private locationWatcherService: LocationWatcherService,
-    private cd: ChangeDetectorRef) {
+    private cd: ChangeDetectorRef,
+    private appStateMonitor: AppStateMonitor) {
+    
+    /**
+     * @todo Android doesn't like this -- GeolocationPositionError is not defined??
+     * Everybody else is ok with it.
+     */
+    //this.errorCodeToMessageMap = new Map([
+    //  [GeolocationPositionError.POSITION_UNAVAILABLE, "Location permission denied"],
+    //  [GeolocationPositionError.POSITION_UNAVAILABLE, "Location not currently available"],
+    //  [GeolocationPositionError.TIMEOUT, "Timeout"]
+    //]);
+  
+    /**
+     * @todo See above
+     */
+    this.errorCodeToMessageMap = new Map([
+      [1, "Location permission denied"],
+      [2, "Location not currently available"],
+      [3, "Timeout"]
+    ]);
+    this.fallbackErrorMessage = "Cannot retrieve location";
 
+    // Emitter for foreground/background events
+    this.emitter = appStateMonitor.getEmitter();
   }
 
   ngOnInit() {
+    console.log("ngOnInit");
+
     this.start();
+
+    // Avoid showing a stale location when the app comes to the foreground.
+    this.emitter.addListener("toForeground", this.clear.bind(this));
   }
 
   ngOnDestroy() {
@@ -43,6 +79,7 @@ export class LatLongComponent implements OnInit {
    * Start watching
    */
   start() {
+    console.log("Start");
     this.clear();
     this.watcherId = this.locationWatcherService.register(this.onLocationUpdate.bind(this));
   }
@@ -56,7 +93,7 @@ export class LatLongComponent implements OnInit {
   }
 
   /**
-   * Clear the bound data
+   * Clear the template-bound data
    */
   clear() {
     console.log("Clearing the bound data");
@@ -78,16 +115,22 @@ export class LatLongComponent implements OnInit {
   }
 
   /**
-   * Error setter
+   * Error setter, map error code to a friendly message
    */
   setError(error: GeolocationPositionError) {
+    //console.log("setError");
     delete this.error;
     if (error) {
+      //console.log("Error code:", error.code);
       this.error = {
         ...error,
         friendlyMessage: this.errorCodeToMessageMap.get(error.code)
       }
-      if (!this.error.friendlyMessage) this.error.friendlyMessage = this.fallbackErrorMessage;
+      if (!this.error.friendlyMessage) {
+        /** @todo iOS not setting error codes?? Its message is not user friendly */
+        // this.error.friendlyMessage = error.message ? error.message : this.fallbackErrorMessage;
+        this.error.friendlyMessage = this.fallbackErrorMessage;
+      }
     }
   }
 

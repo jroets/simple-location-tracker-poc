@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Geolocation, WatchPositionCallback } from '@capacitor/geolocation';
+import { AppStateMonitor } from './app-state-monitor.service';
+import * as EventEmitter from 'events';
 
 /** 
  * This is a singleton location watcher service. It encapsulates a single watcher. 
@@ -10,6 +12,7 @@ import { Geolocation, WatchPositionCallback } from '@capacitor/geolocation';
  * 
  * @todo Notify callbacks of changes to watcher status (starting, running, stopped)
  * @todo Make the location options configurable at the app level
+ * @todo Find easier/better way to monitor foreground/background transition
  */
 @Injectable({
   providedIn: 'root',
@@ -19,8 +22,9 @@ export class LocationWatcherService {
   private callbacks: Map<number, WatchPositionCallback>;
   private options: PositionOptions;
   private nextId: number;
+  private emitter: EventEmitter;
 
-  constructor() { 
+  constructor(private appStateMonitor: AppStateMonitor) { 
     this.nextId = 1;
     this.callbacks = new Map();
 
@@ -31,6 +35,9 @@ export class LocationWatcherService {
       maximumAge: 3600
     }
 
+    // Emitter for foreground/background events
+    this.emitter = appStateMonitor.getEmitter();
+
     // We don't get ngOnInit in service, so make our own init
     this.init();
   }
@@ -39,6 +46,9 @@ export class LocationWatcherService {
   private init(): void {
     // Start the (one and only) watcher
     this.startInternalWatcher();
+
+    // We're going to restart whenever the app comes from the background
+    this.emitter.addListener("toForeground", this.onForeground.bind(this));
   }
 
   /** 
@@ -109,5 +119,21 @@ export class LocationWatcherService {
       console.log("Stopping watcher");
       await Geolocation.clearWatch({id: this.watcherId});
     }
+  }
+
+  /**
+   * Method to restart (stop and start) the internal watcher
+   */
+  private async restartInternalWatcher() {
+    await this.stopInternalWatcher();
+    await this.startInternalWatcher();
+  }
+
+  /**
+   * Callback to handle transition from background to foreground
+   */
+  private onForeground() {
+    console.log("Restarting watcher on foreground");
+    this.restartInternalWatcher();
   }
 }
