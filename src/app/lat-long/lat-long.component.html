@@ -1,14 +1,14 @@
 <ion-list>
   <ion-item>
     <ion-label>Latitude</ion-label>
-    <ion-label slot="end">{{ latitude }}</ion-label>
+    <ion-label slot="end" *ngIf=position>{{ position.coords.latitude }}</ion-label>
   </ion-item>
   <ion-item>
     <ion-label>Longitude</ion-label>
-    <ion-label slot="end">{{ longitude }}</ion-label>
+    <ion-label slot="end" *ngIf=position>{{ position.coords.longitude }}</ion-label>
   </ion-item>
-  <ion-item *ngIf=isError() class="isa_error">
+  <ion-item *ngIf=error class="isa_error">
     <ion-label>Error</ion-label>
-    <ion-label slot="end">{{ getError().message }}</ion-label>
+    <ion-label slot="end">{{ error.message }}</ion-label>
   </ion-item>
 </ion-list>

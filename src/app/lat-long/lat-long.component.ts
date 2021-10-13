@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { LocationWatcherService } from '../services/location-watcher.service';
 
 @Component({
   selector: 'lat-long',
@@ -7,36 +8,54 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LatLongComponent implements OnInit {
 
-  private latitude: number;
-  private longitude: number;
-  private error: any;
+  private position: GeolocationPosition;
+  private error: GeolocationPositionError;
+  private watcherId: number;
 
-  constructor() {
+  constructor(
+    private locationWatcherService: LocationWatcherService) {
 
   }
 
   ngOnInit() {
-    this.latitude = 45.045968;
-    this.longitude = -77.023843;
-    this.error = {
-      message: "Test error"
-    }
+    this.start();
   }
 
   ngOnDestroy() {
-   
+    this.stop();
   }
 
-  /* 
-  Getters/Setters
-  */
-
-  isError(): boolean {
-    return this.error ? true : false;
+  /**
+   * Start watching
+   */
+  start() {
+    this.clear();
+    this.watcherId = this.locationWatcherService.register(this.onLocationUpdate.bind(this));
   }
 
-  getError(): any {
-    return this.error;
+  /** 
+   * Stop watching
+   */
+  stop() {
+    this.locationWatcherService.deregister(this.watcherId);
+    delete this.watcherId;
   }
 
+  /**
+   * Clear the bound data
+   */
+  clear() {
+    console.log("Clearing the bound data");
+    delete this.error;
+    delete this.position;
+  }
+
+  /** 
+   * This is the registered fn to be called by the watcher on location updates.
+   */
+  onLocationUpdate(position: GeolocationPosition, err?: GeolocationPositionError) {
+    // Store the new state so the template can update
+    this.error = err;
+    this.position = position;
+  }
 }

@@ -21,6 +21,7 @@
     "@angular/router": "~12.1.1",
     "@capacitor/app": "1.0.3",
     "@capacitor/core": "3.2.4",
+    "@capacitor/geolocation": "^1.1.0",
     "@capacitor/haptics": "1.1.0",
     "@capacitor/keyboard": "1.1.0",
     "@capacitor/status-bar": "1.0.3",
