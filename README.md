@@ -3,7 +3,9 @@
 ## Overview
 A POC using Ionic/Angular &amp; Capacitor to demonstrate use of a Geolocation Watcher to display real-time latitude and longitude.
 
-This is a standard Capactor app built on a foundation of Ionic UI components and Angular. See [Capacitor docs](https://ionicframework.com/docs/cli/commands/build) for how to run and build.
+See [Ionic docs](https://ionicframework.com/docs/cli/commands/build) for how to build and run.
+
+As this is a POC, it's not written to be production ready. It lacks unit tests, e2e tests, a pretty UI, etc; and the code probably contains undiscovered bugs. Please heed the list of known "implementation problems" below.
 
 ## What this POC technically demonstrates
 * The app is based off of the Ionic Tabs starter template.
@@ -17,7 +19,7 @@ This is a standard Capactor app built on a foundation of Ionic UI components and
 * An angular service was written to monitor the appStateChange event and convert to foreground/background events.
   * Similar concept to the Cordova OnPause and OnResume events.
 
-## Possible next steps for the UX:
+## Possible next steps for the UX
 * Plot movement on a map.
 * Allow the user to invoke a help modal when there are location problems. E.g.
   * Permission denied.
