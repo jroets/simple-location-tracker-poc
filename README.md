@@ -1,11 +1,11 @@
 # simple-location-tracker-poc
+
+## Overview
 A POC using Ionic/Angular &amp; Capacitor to demonstrate use of a Geolocation Watcher to display real-time latitude and longitude.
 
-This is a standard Capactor app built on a foundation of Ionic UI components and Angular. See Capacitor docs for how to run and build.
+This is a standard Capactor app built on a foundation of Ionic UI components and Angular. See [Capacitor docs](https://ionicframework.com/docs/cli/commands/build) for how to run and build.
 
-The app uses the Capacitor Geolocation Plugin.
-
-Some details of what this POC technically demonstrates:
+## What this POC technically demonstrates
 * The app is based off of the Ionic Tabs starter template.
 * The display of latitude/longitude is encapsulated in its own custom UI component.
   * With a very light template.
@@ -17,7 +17,7 @@ Some details of what this POC technically demonstrates:
 * An angular service was written to monitor the appStateChange event and convert to foreground/background events.
   * Similar concept to the Cordova OnPause and OnResume events.
 
-Possible next steps for the UX:
+## Possible next steps for the UX:
 * Plot movement on a map.
 * Allow the user to invoke a help modal when there are location problems. E.g.
   * Permission denied.
@@ -30,24 +30,21 @@ Possible next steps for the UX:
   * Set the timeout value.
   * Set the maximum age value.
 
-Next steps for the code:
-* Consider converting the watcher into an Observable... 
-  * so that the code can be cleaner by getting rid of callbacks and watcher ids 
-  * and so that we can demonstrate a more modern technical approach.
-* Try to find a cross-platform way to detect changes to location permissions while the app is in use...
-  * so that we can better inform the user of their current status. 
+## Current implementation "problems"
+* iOS not reporting error codes when location cannot be retrieved.
+* Angular change detection not automatically firing on android (webview).
+* appStateChange event seems to fire repeatedly on android when location permission is denied.
+* android thinks GeolocationPositionError is undefined in the location watcher service.
+* The approach to the event emitter for background/foreground doesn't seem best practice.
+* Real-time changes to location settings (e.g. permission on/off) not always detected.
+
+## Next steps for the code
+* Consider converting the watcher into an Observable
+* Try to find a cross-platform way to detect changes to location permissions while the app is in use 
   * E.g. For web, see https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus
-* Have the watcher emit events when its state changes (starting, running, stopping)...
-  * so that the view can have the info at its disposal (e.g. to inform the user of things like "loading")
-  * and so that we can get rid of the current approach that has the view monitor for appStateChange.
-* Review and possibly better implement the foreground/background event emitter service...
-  * so that we don't have bad practices in the code.
-* Eliminate the forced change detection...
-  * so that we don't have bad practices in the code.
-* Figure out what is going on with the geolocation plugin on iOS not reporting error codes (always undefined)...
-  * so that we can report a bug in the plugin if there is one
-  * and so that we can come up with a way to show a more specific message to the user on iOS.
-* Figure out why android (webview) thinks GeolocationPositionError is undefined in the controller...
-  * so that we don't have bad practices in the code.
-* Investigate the appStateChange event firing repeatedly on android when location permission denied...
-  * so that we can report a bug in the plugin if there is one.
+* Emit events from the watcher when its running state changes (starting, running, stopping)
+* Review and possibly better implement the foreground/background event emitter service
+* Eliminate the forced change detection
+* Address the geolocation plugin on iOS not reporting error codes (always undefined)
+* Address android (webview) thinking GeolocationPositionError is undefined in the controller
+* Investigate the appStateChange event firing repeatedly on android when location permission denied
