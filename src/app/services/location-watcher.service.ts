@@ -92,7 +92,7 @@ export class LocationWatcherService {
   private internalCallback(position: GeolocationPosition, err?: GeolocationPositionError): void {
     // Log a few things
     if (position) console.log("Reported position:", position.coords.latitude, position.coords.longitude);
-    if (err) console.log("Reported Error:", err.message);
+    if (err) console.log("Reported Error (" + err.code + ") " + err.message);
 
     // Loop through and call each registered callback
     this.callbacks.forEach(callback => callback(position, err));
